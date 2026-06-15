@@ -1,5 +1,8 @@
 # Day 13 Observability Lab Template
 
+<strong>Học viên:</strong> Nguyễn Tuấn Dũng<br>
+<strong>Mã học viên:</strong> 2A202600848
+
 Template repo for a 4-hour hands-on lab on Monitoring, Logging, and Observability.
 
 ## What students will build
@@ -27,17 +30,20 @@ This template is intentionally incomplete. Teams are expected to finish TODOs du
 
 ## Quick start
 
-```bash
+Requires Python 3.11 or newer. The dependencies include a prebuilt Windows wheel for Python 3.14, so Visual Studio Build Tools and Rust are not required.
+
+```powershell
 python -m venv .venv
-source .venv/bin/activate
-pip install -r requirements.txt
-cp .env.example .env
-uvicorn app.main:app --reload
+.\.venv\Scripts\Activate.ps1
+python -m pip install --upgrade pip
+python -m pip install -r requirements.txt
+Copy-Item .env.example .env
+python -m uvicorn app.main:app --reload --env-file .env
 ```
 
 ## Tooling
 
-```bash
+```powershell
 # Generate requests (use --concurrency 5 to test parallel bottlenecks)
 python scripts/load_test.py --concurrency 5
 
