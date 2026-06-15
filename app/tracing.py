@@ -39,3 +39,7 @@ except (ImportError, ModuleNotFoundError):  # pragma: no cover
 
 def tracing_enabled() -> bool:
     return bool(os.getenv("LANGFUSE_PUBLIC_KEY") and os.getenv("LANGFUSE_SECRET_KEY"))
+
+def flush_traces() -> None:
+    if tracing_enabled() and "get_client" in globals():
+        get_client().flush()

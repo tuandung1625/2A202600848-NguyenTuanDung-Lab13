@@ -25,10 +25,10 @@ class LabAgent:
         self.model = model
         self.llm = FakeLLM(model=model)
 
-    @observe()
+    @observe(name="agent_run", capture_input=False, capture_output=False)
     def run(self, user_id: str, feature: str, session_id: str, message: str) -> AgentResult:
         started = time.perf_counter()
-        docs = retrieve(message)
+        docs = self._retrieve(message)
         prompt = f"Feature={feature}\nDocs={docs}\nQuestion={message}"
         response = self.llm.generate(prompt)
         quality_score = self._heuristic_quality(message, response.text, docs)
@@ -60,6 +60,14 @@ class LabAgent:
             cost_usd=cost_usd,
             quality_score=quality_score,
         )
+
+    @observe(name="rag_retrieval", capture_input=False, capture_output=False)
+    def _retrieve(self, message: str) -> list[str]:
+        docs = retrieve(message)
+        langfuse_context.update_current_observation(
+            metadata={"doc_count": len(docs), "query_preview": summarize_text(message)}
+        )
+        return docs
 
     def _estimate_cost(self, tokens_in: int, tokens_out: int) -> float:
         input_cost = (tokens_in / 1_000_000) * 3

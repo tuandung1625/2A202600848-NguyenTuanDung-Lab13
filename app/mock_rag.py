@@ -17,7 +17,10 @@ def retrieve(message: str) -> list[str]:
     if STATE["rag_slow"]:
         time.sleep(2.5)
     lowered = message.lower()
-    for key, docs in CORPUS.items():
-        if key in lowered:
-            return docs
+    if "refund" in lowered:
+        return CORPUS["refund"]
+    if any(keyword in lowered for keyword in ["monitoring", "metrics", "traces", "latency", "alerts"]):
+        return CORPUS["monitoring"]
+    if any(keyword in lowered for keyword in ["policy", "pii", "sensitive", "app logs"]):
+        return CORPUS["policy"]
     return ["No domain document matched. Use general fallback answer."]

@@ -1,6 +1,13 @@
 import json
+import re
 import sys
 from pathlib import Path
+
+PROJECT_ROOT = Path(__file__).resolve().parents[1]
+if str(PROJECT_ROOT) not in sys.path:
+    sys.path.insert(0, str(PROJECT_ROOT))
+
+from app.pii import PII_PATTERNS
 
 LOG_PATH = Path("data/logs.jsonl")
 REQUIRED_FIELDS = {"ts", "level", "service", "event", "correlation_id"}
@@ -31,8 +38,8 @@ def main() -> None:
     correlation_ids = set()
 
     for rec in records:
-        # Check required fields (global)
-        if not {"ts", "level", "event"}.issubset(rec.keys()):
+        # Check the complete structured logging schema.
+        if not REQUIRED_FIELDS.issubset(rec.keys()):
             missing_required += 1
             
         # Context-specific checks for API requests
@@ -43,9 +50,9 @@ def main() -> None:
             if not ENRICHMENT_FIELDS.issubset(rec.keys()):
                 missing_enrichment += 1
 
-        # Check PII (naive check for @ or common test credit card)
+        # Check raw records against all configured PII patterns.
         raw = json.dumps(rec)
-        if "@" in raw or "4111" in raw:
+        if any(re.search(pattern, raw) for pattern in PII_PATTERNS.values()):
             pii_hits.append(rec.get("event", "unknown"))
 
         # Collect correlation IDs
