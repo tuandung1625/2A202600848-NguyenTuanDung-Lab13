@@ -15,7 +15,7 @@
 
 ## 2. High error rate
 - Severity: P1
-- Trigger: `error_rate_pct > 5 for 5m`
+- Trigger: `latency_p95_ms > 3000 for 5m`
 - Impact: users receive failed responses
 - First checks:
   1. Group logs by `error_type`
@@ -28,7 +28,7 @@
 
 ## 3. Cost budget spike
 - Severity: P2
-- Trigger: `hourly_cost_usd > 2x_baseline for 15m`
+- Trigger: `max_cost_usd > 0.005 for 1m`
 - Impact: burn rate exceeds budget
 - First checks:
   1. Split traces by feature and model
